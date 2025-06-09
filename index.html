@@ -40,28 +40,29 @@
     </style>
 </head>
 <body class="p-4 md:p-0">
-    <!-- Login Page -->
+    <!-- Admin Login Page -->
     <div id="admin-login-page" class="flex items-center justify-center min-h-screen" style="display:none;">
-  <div class="login-container w-full max-w-md p-8">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">Admin Login</h1>
-      <p class="text-gray-600 mt-2">Admin Panel</p>
+      <div class="login-container w-full max-w-md p-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-gray-800">Admin Login</h1>
+          <p class="text-gray-600 mt-2">Admin Panel</p>
+        </div>
+        <form id="admin-login-form" class="space-y-4">
+          <div>
+            <label for="admin-email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="admin-email" name="admin-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+          <div>
+            <label for="admin-password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="admin-password" name="admin-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+          <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Login as Admin</button>
+          <button type="button" id="back-to-user-login" class="mt-2 w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300">Back to Student Login</button>
+        </form>
+        <div id="admin-login-message" class="text-center mt-4 text-red-600"></div>
+      </div>
     </div>
-    <form id="admin-login-form" class="space-y-4">
-      <div>
-        <label for="admin-email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="admin-email" name="admin-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div>
-        <label for="admin-password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="admin-password" name="admin-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Login as Admin</button>
-      <button type="button" id="back-to-user-login" class="mt-2 w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300">Back to Student Login</button>
-    </form>
-    <div id="admin-login-message" class="text-center mt-4 text-red-600"></div>
-  </div>
-</div>
+    <!-- Student Login Page -->
     <div id="login-page" class="flex items-center justify-center min-h-screen">
         <div class="login-container w-full max-w-md p-8">
             <div class="text-center mb-8">
@@ -100,6 +101,10 @@
                         Register
                     </button>
                 </div>
+                <!-- Admin Login Button -->
+                <button type="button" id="admin-login-btn" class="w-full mt-2 py-2 px-4 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300">
+                  Admin Login
+                </button>
             </form>
             <div id="login-message" class="text-center mt-4 text-red-600"></div>
         </div>
@@ -108,6 +113,7 @@
         </footer>
     </div>
     <!-- Game Page -->
+    <!-- ... [The full game HTML as previously provided] ... -->
     <div id="game-page" class="game-container max-w-4xl mx-auto p-4 md:p-8 my-8" style="display:none;">
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -213,28 +219,29 @@
         <p class="text-gray-700">© 2025 Francisco P. Felix Memorial National High School</p>
     </footer>
 </div>
+    </div>
+    <!-- Admin Dashboard Page -->
     <div id="admin-page" class="game-container max-w-4xl mx-auto p-4 md:p-8 my-8" style="display:none;">
-  <h2 class="text-2xl font-bold mb-4">Student Progress Dashboard</h2>
-  <table class="min-w-full bg-white">
-    <thead>
-      <tr>
-        <th class="py-2 px-4 border-b">Student Email</th>
-        <th class="py-2 px-4 border-b">Grade</th>
-        <th class="py-2 px-4 border-b">Lessons Completed</th>
-        <th class="py-2 px-4 border-b">Quiz Score</th>
-      </tr>
-    </thead>
-    <tbody id="students-progress-table">
-      <!-- Rows will be generated here -->
-    </tbody>
-  </table>
-  <button id="admin-logout-btn" class="mt-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium">
-    Logout
-  </button>
-</div>
+      <h2 class="text-2xl font-bold mb-4">Student Progress Dashboard</h2>
+      <table class="min-w-full bg-white">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 border-b">Student Email</th>
+            <th class="py-2 px-4 border-b">Grade</th>
+            <th class="py-2 px-4 border-b">Lessons Completed</th>
+            <th class="py-2 px-4 border-b">Quiz Score</th>
+          </tr>
+        </thead>
+        <tbody id="students-progress-table">
+          <!-- Rows will be generated here -->
+        </tbody>
+      </table>
+      <button id="admin-logout-btn" class="mt-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium">
+        Logout
+      </button>
+    </div>
     <script>
-
-    // Firebase Setup
+    // --- Firebase Setup ---
     const firebaseConfig = {
       apiKey: "AIzaSyCzPN25sXmaDuh_f_6tWQTTj6ykOi1yP4Y",
       authDomain: "spfl-672c4.firebaseapp.com",
@@ -244,7 +251,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // UI Variables
+    // --- UI Variables ---
     const loginPage = document.getElementById("login-page");
     const gamePage = document.getElementById("game-page");
     const loginForm = document.getElementById("login-form");
@@ -254,80 +261,155 @@
     const welcomeMessage = document.getElementById("welcome-message");
     const difficultyIndicator = document.getElementById("difficulty-indicator");
 
-    // Game State
+    // --- Admin UI Variables ---
+    const adminLoginBtn = document.getElementById('admin-login-btn');
+    const adminLoginPage = document.getElementById('admin-login-page');
+    const adminLoginForm = document.getElementById('admin-login-form');
+    const adminLoginMessage = document.getElementById('admin-login-message');
+    const backToUserLogin = document.getElementById('back-to-user-login');
+    const adminPage = document.getElementById('admin-page');
+    const studentsProgressTable = document.getElementById('students-progress-table');
+    const adminLogoutBtn = document.getElementById('admin-logout-btn');
+
+    // --- Game State ---
     let username = "";
     let userGrade = 7;
     let userUID = "";
     let learnedCards = 0;
     let quizScore = 0;
 
-    // Firebase Auth and Game Launch
-    loginForm.addEventListener("submit", async function(e) {
-        e.preventDefault();
-        loginMessage.textContent = "";
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        userGrade = document.getElementById("grade").value;
-        try {
-            const result = await auth.signInWithEmailAndPassword(email, password);
-            userUID = result.user.uid;
-            const userDoc = await db.collection('users').doc(userUID).get();
-            username = userDoc.data()?.username || email.split("@")[0];
-            userGrade = userDoc.data()?.grade || userGrade;
-            welcomeMessage.textContent = `Welcome, ${username}!`;
-            await loadOrInitProgress();
-            loginPage.style.display = "none";
-            gamePage.style.display = "block";
-            if (typeof initGame === "function") initGame();
-        } catch (error) {
-            loginMessage.textContent = error.message;
+    // --- Admin Navigation ---
+    adminLoginBtn.addEventListener('click', function() {
+      loginPage.style.display = "none";
+      adminLoginPage.style.display = "flex";
+    });
+
+    backToUserLogin.addEventListener('click', function() {
+      adminLoginPage.style.display = "none";
+      loginPage.style.display = "flex";
+    });
+
+    adminLoginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      adminLoginMessage.textContent = "";
+      const email = document.getElementById('admin-email').value.trim();
+      const password = document.getElementById('admin-password').value;
+      try {
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        const userUID = result.user.uid;
+        const userDoc = await db.collection('users').doc(userUID).get();
+        if (userDoc.exists && userDoc.data().role === 'admin') {
+          adminLoginPage.style.display = "none";
+          adminPage.style.display = "block";
+          loadAllStudentProgress();
+        } else {
+          adminLoginMessage.textContent = "You are not authorized as admin.";
+          auth.signOut();
         }
+      } catch (error) {
+        adminLoginMessage.textContent = error.message;
+      }
+    });
+
+    adminLogoutBtn.addEventListener('click', function() {
+      auth.signOut().then(() => {
+        adminPage.style.display = "none";
+        loginPage.style.display = "flex";
+      });
+    });
+
+    async function loadAllStudentProgress() {
+      studentsProgressTable.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading...</td></tr>';
+      const usersSnap = await db.collection('users').where('role', '==', 'student').get();
+      let rows = '';
+      for (const doc of usersSnap.docs) {
+        const userData = doc.data();
+        const progressDoc = await db.collection('progress').doc(doc.id).get();
+        const progress = progressDoc.exists ? progressDoc.data() : {};
+        rows += `<tr>
+          <td class="py-2 px-4 border-b">${userData.username || '(no username)'}</td>
+          <td class="py-2 px-4 border-b">${userData.grade || ''}</td>
+          <td class="py-2 px-4 border-b">${progress.lessonsCompleted || 0}</td>
+          <td class="py-2 px-4 border-b">${progress.score || 0}</td>
+        </tr>`;
+      }
+      studentsProgressTable.innerHTML = rows;
+    }
+
+    // --- Student Login/Register and Game Launch ---
+    loginForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      loginMessage.textContent = "";
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      userGrade = document.getElementById("grade").value;
+      try {
+          const result = await auth.signInWithEmailAndPassword(email, password);
+          userUID = result.user.uid;
+          const userDoc = await db.collection('users').doc(userUID).get();
+          username = userDoc.data()?.username || email.split("@")[0];
+          userGrade = userDoc.data()?.grade || userGrade;
+          // If this is an admin, redirect to admin panel
+          if (userDoc.data()?.role === "admin") {
+            loginPage.style.display = "none";
+            adminPage.style.display = "block";
+            loadAllStudentProgress();
+            return;
+          }
+          welcomeMessage.textContent = `Welcome, ${username}!`;
+          await loadOrInitProgress();
+          loginPage.style.display = "none";
+          gamePage.style.display = "block";
+          if (typeof initGame === "function") initGame();
+      } catch (error) {
+          loginMessage.textContent = error.message;
+      }
     });
 
     registerBtn.addEventListener("click", async function() {
-        loginMessage.textContent = "";
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const grade = document.getElementById("grade").value;
-        if (!email || !password) {
-            loginMessage.textContent = "Please provide email and password.";
-            return;
-        }
-        try {
-            const result = await auth.createUserWithEmailAndPassword(email, password);
-            userUID = result.user.uid;
-            username = email.split("@")[0];
-            userGrade = grade;
-            await db.collection('users').doc(userUID).set({
-                username,
-                grade: userGrade,
-                role: "student"
-            });
-            await db.collection('progress').doc(userUID).set({
-                lessonsCompleted: 0,
-                score: 0
-            });
-            loginMessage.textContent = "Registration successful! Please log in.";
-        } catch (error) {
-            loginMessage.textContent = error.message;
-        }
+      loginMessage.textContent = "";
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const grade = document.getElementById("grade").value;
+      if (!email || !password) {
+          loginMessage.textContent = "Please provide email and password.";
+          return;
+      }
+      try {
+          const result = await auth.createUserWithEmailAndPassword(email, password);
+          userUID = result.user.uid;
+          username = email.split("@")[0];
+          userGrade = grade;
+          await db.collection('users').doc(userUID).set({
+              username,
+              grade: userGrade,
+              role: "student"
+          });
+          await db.collection('progress').doc(userUID).set({
+              lessonsCompleted: 0,
+              score: 0
+          });
+          loginMessage.textContent = "Registration successful! Please log in.";
+      } catch (error) {
+          loginMessage.textContent = error.message;
+      }
     });
 
     document.body.addEventListener("click", function(e) {
-        if (e.target && e.target.id === "logout-btn") {
-            auth.signOut().then(() => {
-                loginPage.style.display = "flex";
-                gamePage.style.display = "none";
-                document.getElementById("email").value = "";
-                document.getElementById("password").value = "";
-                document.getElementById("grade").value = "7";
-                loginMessage.textContent = "";
-                if (typeof resetGame === "function") resetGame();
-            });
-        }
+      if (e.target && e.target.id === "logout-btn") {
+          auth.signOut().then(() => {
+              loginPage.style.display = "flex";
+              gamePage.style.display = "none";
+              document.getElementById("email").value = "";
+              document.getElementById("password").value = "";
+              document.getElementById("grade").value = "7";
+              loginMessage.textContent = "";
+              if (typeof resetGame === "function") resetGame();
+          });
+      }
     });
 
-    // Progress Tracking
+    // --- Progress Tracking ---
     async function loadOrInitProgress() {
         const progressDoc = await db.collection('progress').doc(userUID).get();
         if (progressDoc.exists) {
@@ -890,78 +972,6 @@ restartBtn.addEventListener("click", resetGame);
 switchModeBtn.addEventListener("click", function() {
     switchMode();
 });
-        // Navigation buttons
-const adminLoginBtn = document.getElementById('admin-login-btn');
-const adminLoginPage = document.getElementById('admin-login-page');
-const adminLoginForm = document.getElementById('admin-login-form');
-const adminLoginMessage = document.getElementById('admin-login-message');
-const backToUserLogin = document.getElementById('back-to-user-login');
-const adminPage = document.getElementById('admin-page');
-const studentsProgressTable = document.getElementById('students-progress-table');
-const adminLogoutBtn = document.getElementById('admin-logout-btn');
-
-// Show admin login page
-adminLoginBtn.addEventListener('click', function() {
-  loginPage.style.display = "none";
-  adminLoginPage.style.display = "flex";
-});
-
-// Back to student login
-backToUserLogin.addEventListener('click', function() {
-  adminLoginPage.style.display = "none";
-  loginPage.style.display = "flex";
-});
-
-// Admin login logic
-adminLoginForm.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  adminLoginMessage.textContent = "";
-  const email = document.getElementById('admin-email').value.trim();
-  const password = document.getElementById('admin-password').value;
-  try {
-    const result = await auth.signInWithEmailAndPassword(email, password);
-    const userUID = result.user.uid;
-    const userDoc = await db.collection('users').doc(userUID).get();
-    if (userDoc.exists && userDoc.data().role === 'admin') {
-      adminLoginPage.style.display = "none";
-      adminPage.style.display = "block";
-      loadAllStudentProgress();
-    } else {
-      adminLoginMessage.textContent = "You are not authorized as admin.";
-      auth.signOut();
-    }
-  } catch (error) {
-    adminLoginMessage.textContent = error.message;
-  }
-});
-
-// Load all students' progress for admin dashboard
-async function loadAllStudentProgress() {
-  studentsProgressTable.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading...</td></tr>';
-  const usersSnap = await db.collection('users').where('role', '==', 'student').get();
-  let rows = '';
-  for (const doc of usersSnap.docs) {
-    const userData = doc.data();
-    const progressDoc = await db.collection('progress').doc(doc.id).get();
-    const progress = progressDoc.exists ? progressDoc.data() : {};
-    rows += `<tr>
-      <td class="py-2 px-4 border-b">${userData.username || '(no username)'}</td>
-      <td class="py-2 px-4 border-b">${userData.grade || ''}</td>
-      <td class="py-2 px-4 border-b">${progress.lessonsCompleted || 0}</td>
-      <td class="py-2 px-4 border-b">${progress.score || 0}</td>
-    </tr>`;
-  }
-  studentsProgressTable.innerHTML = rows;
-}
-
-// Admin logout
-adminLogoutBtn.addEventListener('click', function() {
-  auth.signOut().then(() => {
-    adminPage.style.display = "none";
-    loginPage.style.display = "flex";
-  });
-});
-
     </script>
 </body>
 </html>
