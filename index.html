@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,185 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Korean Alphabet Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
-        
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .login-container {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .game-container {
-            display: none;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .tab-active {
-            background-color: #4F46E5;
-            color: white;
-        }
-        
-        .card {
-            perspective: 1000px;
-            height: 150px;
-            cursor: pointer;
-        }
-        
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        
-        .card.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
-        
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-        }
-        
-        .card-front {
-            background-color: #4F46E5;
-            color: white;
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-        
-        .card-back {
-            background-color: #E5E7EB;
-            color: #1F2937;
-            transform: rotateY(180deg);
-            font-size: 1.5rem;
-        }
-        
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            opacity: 0;
-            animation: confetti-fall 3s ease-in-out forwards;
-            z-index: 1000;
-        }
-        
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; flex-direction: column;}
+        .login-container { background: white; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); overflow: hidden;}
+        .game-container { display: none; background: white; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);}
+        .tab-active { background-color: #4F46E5; color: white;}
+        .card { perspective: 1000px; height: 150px; cursor: pointer;}
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d;}
+        .card.flipped .card-inner { transform: rotateY(180deg);}
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem;}
+        .card-front { background-color: #4F46E5; color: white; font-size: 2.5rem; font-weight: bold;}
+        .card-back { background-color: #E5E7EB; color: #1F2937; transform: rotateY(180deg); font-size: 1.5rem;}
+        .confetti { position: fixed; width: 10px; height: 10px; background-color: #f00; opacity: 0; animation: confetti-fall 3s ease-in-out forwards; z-index: 1000;}
         @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
+            0% {transform: translateY(-100vh) rotate(0deg); opacity: 1;}
+            100% {transform: translateY(100vh) rotate(720deg); opacity: 0;}
         }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: #E5E7EB;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
-            background-color: #4F46E5;
-            transition: width 0.3s ease;
-        }
-        
-        .footer {
-            margin-top: auto;
-            padding: 1rem;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .difficulty-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 4px 8px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        
-        .timer {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        
-        .word-container {
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .syllable-block {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            margin: 0 5px;
-            border: 2px solid #4F46E5;
-            border-radius: 8px;
-            font-size: 1.75rem;
-            font-weight: bold;
-        }
-        
-        .matching-game {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        
-        .matching-card {
-            height: 100px;
-            background-color: #4F46E5;
-            color: white;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .matching-card.flipped {
-            transform: rotateY(180deg);
-            background-color: #E5E7EB;
-            color: #1F2937;
-        }
-        
-        .matching-card.matched {
-            background-color: #10B981;
-            pointer-events: none;
-        }
+        .progress-bar { height: 10px; background-color: #E5E7EB; border-radius: 5px; overflow: hidden;}
+        .progress { height: 100%; background-color: #4F46E5; transition: width 0.3s ease;}
+        .footer { margin-top: auto; padding: 1rem; text-align: center; background-color: rgba(255, 255, 255, 0.7); border-top: 1px solid #e5e7eb;}
+        .difficulty-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold;}
+        .timer { font-size: 1.25rem; font-weight: bold;}
+        .word-container { min-height: 60px; display: flex; align-items: center; justify-content: center;}
+        .syllable-block { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin: 0 5px; border: 2px solid #4F46E5; border-radius: 8px; font-size: 1.75rem; font-weight: bold;}
+        .matching-game { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;}
+        .matching-card { height: 100px; background-color: #4F46E5; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;}
+        .matching-card.flipped { transform: rotateY(180deg); background-color: #E5E7EB; color: #1F2937;}
+        .matching-card.matched { background-color: #10B981; pointer-events: none;}
     </style>
 </head>
 <body class="p-4 md:p-0">
@@ -196,20 +47,21 @@
                 <h1 class="text-3xl font-bold text-gray-800">한글 게임</h1>
                 <p class="text-gray-600 mt-2">Korean Alphabet Game</p>
             </div>
-            
             <div class="mb-6">
                 <svg class="w-32 h-32 mx-auto" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="45" fill="#4F46E5" />
                     <text x="50" y="65" font-size="40" text-anchor="middle" fill="white" font-weight="bold">한글</text>
                 </svg>
             </div>
-            
             <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
                 </div>
-                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
                 <div>
                     <label for="grade" class="block text-sm font-medium text-gray-700">Grade</label>
                     <select id="grade" name="grade" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
@@ -219,21 +71,21 @@
                         <option value="10">Grade 10</option>
                     </select>
                 </div>
-                
-                <div>
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Start Learning
+                <div class="flex gap-2">
+                    <button type="submit" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Login
+                    </button>
+                    <button type="button" id="register-btn" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Register
                     </button>
                 </div>
             </form>
+            <div id="login-message" class="text-center mt-4 text-red-600"></div>
         </div>
-        
-        <!-- Footer for Login Page -->
         <footer class="fixed bottom-0 w-full py-3 bg-white bg-opacity-90 border-t border-gray-200 text-center">
             <p class="text-gray-700">© 2025 Francisco P. Felix Memorial National High School</p>
         </footer>
     </div>
-    
     <!-- Game Page -->
     <div id="game-page" class="game-container max-w-4xl mx-auto p-4 md:p-8 my-8">
         <div class="flex justify-between items-center mb-6">
@@ -248,7 +100,6 @@
                 Logout
             </button>
         </div>
-        
         <div class="mb-6">
             <div class="flex space-x-2 mb-2">
                 <div id="tab-vowels" class="tab-active px-4 py-2 rounded-t-lg cursor-pointer flex-1 text-center">
@@ -269,71 +120,43 @@
                         <span id="score" class="ml-2">0/0</span>
                     </div>
                 </div>
-                
                 <div id="game-instructions" class="mb-4 p-3 bg-blue-50 text-blue-800 rounded-md">
                     Click on each card to learn Korean vowels. Try to memorize them all!
                 </div>
-                
-                <!-- Timer for higher grades -->
                 <div id="timer-container" class="mb-4 text-center hidden">
                     <div class="timer p-2 bg-yellow-100 text-yellow-800 rounded-md inline-block">
                         Time: <span id="timer">00:00</span>
                     </div>
                 </div>
-                
-                <!-- Game Content Area -->
-                <div id="vowels-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Vowels cards will be generated here -->
-                </div>
-                
-                <div id="consonants-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;">
-                    <!-- Consonants cards will be generated here -->
-                </div>
-                
-                <!-- Word Formation Area (Grade 9) -->
+                <div id="vowels-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                <div id="consonants-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;"></div>
                 <div id="word-formation" class="mt-6" style="display: none;">
                     <div class="bg-green-50 p-4 rounded-md mb-4">
                         <h3 class="font-bold text-lg mb-2">Form Korean Words</h3>
                         <p>Drag and drop the characters to form the correct Korean word:</p>
                     </div>
-                    
                     <div class="word-container p-4 bg-white rounded-md mb-4">
                         <div id="target-word" class="flex justify-center"></div>
                     </div>
-                    
-                    <div id="character-bank" class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-md">
-                        <!-- Characters will be generated here -->
-                    </div>
+                    <div id="character-bank" class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-md"></div>
                 </div>
-                
-                <!-- Matching Game (Grade 10) -->
                 <div id="matching-game" class="mt-6" style="display: none;">
                     <div class="bg-purple-50 p-4 rounded-md mb-4">
                         <h3 class="font-bold text-lg mb-2">Memory Matching Game</h3>
                         <p>Match Korean characters with their correct pronunciation:</p>
                     </div>
-                    
-                    <div id="matching-grid" class="matching-game">
-                        <!-- Matching cards will be generated here -->
-                    </div>
+                    <div id="matching-grid" class="matching-game"></div>
                 </div>
-                
-                <!-- Quiz Area -->
                 <div id="quiz-area" class="mt-6" style="display: none;">
                     <div class="bg-yellow-50 p-4 rounded-md mb-4">
                         <h3 class="font-bold text-lg mb-2">Quiz Time!</h3>
                         <p id="quiz-question">Match the Korean character with its correct pronunciation:</p>
                     </div>
-                    
                     <div class="flex flex-col items-center">
                         <div id="quiz-character" class="text-5xl font-bold mb-4">ㅏ</div>
-                        <div id="quiz-options" class="grid grid-cols-2 gap-3 w-full max-w-md">
-                            <!-- Quiz options will be generated here -->
-                        </div>
+                        <div id="quiz-options" class="grid grid-cols-2 gap-3 w-full max-w-md"></div>
                     </div>
                 </div>
-                
-                <!-- Results Area -->
                 <div id="results-area" class="mt-6 text-center" style="display: none;">
                     <h3 class="font-bold text-xl mb-2">Great Job!</h3>
                     <p id="final-score" class="text-lg mb-4">Your score: 0/0</p>
@@ -348,12 +171,164 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Footer for Game Page -->
         <footer class="mt-8 py-4 border-t border-gray-200 text-center">
             <p class="text-gray-700">© 2025 Francisco P. Felix Memorial National High School</p>
         </footer>
     </div>
+    <script>
+    // --- Firebase Setup ---
+    // TODO: Replace with your Firebase project config!
+    const firebaseConfig = {
+      apiKey: "AIzaSyCzPN25sXmaDuh_f_6tWQTTj6ykOi1yP4Y",
+      authDomain: "spfl-672c4.firebaseapp.com",
+      projectId: "spfl-672c4",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // --- UI Variables ---
+    const loginPage = document.getElementById("login-page");
+    const gamePage = document.getElementById("game-page");
+    const loginForm = document.getElementById("login-form");
+    const registerBtn = document.getElementById("register-btn");
+    const loginMessage = document.getElementById("login-message");
+    const logoutBtn = document.getElementById("logout-btn");
+    const welcomeMessage = document.getElementById("welcome-message");
+    const difficultyIndicator = document.getElementById("difficulty-indicator");
+
+    // --- Game UI Elements ---
+    const tabVowels = document.getElementById("tab-vowels");
+    const tabConsonants = document.getElementById("tab-consonants");
+    const currentModeEl = document.getElementById("current-mode");
+    const vowelsContent = document.getElementById("vowels-content");
+    const consonantsContent = document.getElementById("consonants-content");
+    const progressBar = document.getElementById("progress");
+    const scoreEl = document.getElementById("score");
+    const timerContainer = document.getElementById("timer-container");
+    const timerEl = document.getElementById("timer");
+    const quizArea = document.getElementById("quiz-area");
+    const quizCharacter = document.getElementById("quiz-character");
+    const quizOptions = document.getElementById("quiz-options");
+    const resultsArea = document.getElementById("results-area");
+    const finalScoreEl = document.getElementById("final-score");
+    const restartBtn = document.getElementById("restart-btn");
+    const switchModeBtn = document.getElementById("switch-mode-btn");
+    const gameInstructions = document.getElementById("game-instructions");
+    const wordFormation = document.getElementById("word-formation");
+    const targetWord = document.getElementById("target-word");
+    const characterBank = document.getElementById("character-bank");
+    const matchingGame = document.getElementById("matching-game");
+    const matchingGrid = document.getElementById("matching-grid");
+
+    // --- Game State ---
+    let username = "";
+    let userGrade = 7;
+    let userUID = "";
+    let currentMode = "vowels";
+    let learnedCards = 0;
+    let totalCards = 0;
+    let quizScore = 0;
+    let quizTotal = 0;
+    let currentQuizIndex = 0;
+    let quizQuestions = [];
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let matchedPairs = 0;
+    let totalPairs = 0;
+    let firstCard = null;
+    let secondCard = null;
+    let canFlip = true;
+
+    // --- Firebase Authentication and User Logic ---
+    loginForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        loginMessage.textContent = "";
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        userGrade = document.getElementById("grade").value;
+        try {
+            const result = await auth.signInWithEmailAndPassword(email, password);
+            userUID = result.user.uid;
+            // Load profile and progress
+            const userDoc = await db.collection('users').doc(userUID).get();
+            username = userDoc.data()?.username || email.split("@")[0];
+            userGrade = userDoc.data()?.grade || userGrade;
+            welcomeMessage.textContent = `Welcome, ${username}!`;
+            await loadOrInitProgress();
+            loginPage.style.display = "none";
+            gamePage.style.display = "block";
+            initGame();
+        } catch (error) {
+            loginMessage.textContent = error.message;
+        }
+    });
+
+    registerBtn.addEventListener("click", async function() {
+        loginMessage.textContent = "";
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const grade = document.getElementById("grade").value;
+        if (!email || !password) {
+            loginMessage.textContent = "Please provide email and password.";
+            return;
+        }
+        try {
+            const result = await auth.createUserWithEmailAndPassword(email, password);
+            userUID = result.user.uid;
+            username = email.split("@")[0];
+            userGrade = grade;
+            // Create profile in Firestore
+            await db.collection('users').doc(userUID).set({
+                username,
+                grade: userGrade,
+                role: "student"
+            });
+            // Initialize progress
+            await db.collection('progress').doc(userUID).set({
+                lessonsCompleted: 0,
+                score: 0
+            });
+            loginMessage.textContent = "Registration successful! Please log in.";
+        } catch (error) {
+            loginMessage.textContent = error.message;
+        }
+    });
+
+    logoutBtn.addEventListener("click", function() {
+        auth.signOut().then(() => {
+            loginPage.style.display = "flex";
+            gamePage.style.display = "none";
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("grade").value = "7";
+            loginMessage.textContent = "";
+            resetGame();
+        });
+    });
+
+    // --- Progress Tracking ---
+    async function loadOrInitProgress() {
+        const progressDoc = await db.collection('progress').doc(userUID).get();
+        if (progressDoc.exists) {
+            learnedCards = progressDoc.data().lessonsCompleted || 0;
+            quizScore = progressDoc.data().score || 0;
+        } else {
+            await db.collection('progress').doc(userUID).set({
+                lessonsCompleted: 0,
+                score: 0
+            });
+            learnedCards = 0;
+            quizScore = 0;
+        }
+    }
+
+    function saveProgress() {
+        db.collection('progress').doc(userUID).set({
+            lessonsCompleted: learnedCards,
+            score: quizScore
+        }, { merge: true });
+    }
     
     <script>
         // Korean alphabet data
