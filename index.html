@@ -41,6 +41,27 @@
 </head>
 <body class="p-4 md:p-0">
     <!-- Login Page -->
+    <div id="admin-login-page" class="flex items-center justify-center min-h-screen" style="display:none;">
+  <div class="login-container w-full max-w-md p-8">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Admin Login</h1>
+      <p class="text-gray-600 mt-2">Admin Panel</p>
+    </div>
+    <form id="admin-login-form" class="space-y-4">
+      <div>
+        <label for="admin-email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="admin-email" name="admin-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <div>
+        <label for="admin-password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="admin-password" name="admin-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Login as Admin</button>
+      <button type="button" id="back-to-user-login" class="mt-2 w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300">Back to Student Login</button>
+    </form>
+    <div id="admin-login-message" class="text-center mt-4 text-red-600"></div>
+  </div>
+</div>
     <div id="login-page" class="flex items-center justify-center min-h-screen">
         <div class="login-container w-full max-w-md p-8">
             <div class="text-center mb-8">
@@ -192,7 +213,27 @@
         <p class="text-gray-700">© 2025 Francisco P. Felix Memorial National High School</p>
     </footer>
 </div>
+    <div id="admin-page" class="game-container max-w-4xl mx-auto p-4 md:p-8 my-8" style="display:none;">
+  <h2 class="text-2xl font-bold mb-4">Student Progress Dashboard</h2>
+  <table class="min-w-full bg-white">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b">Student Email</th>
+        <th class="py-2 px-4 border-b">Grade</th>
+        <th class="py-2 px-4 border-b">Lessons Completed</th>
+        <th class="py-2 px-4 border-b">Quiz Score</th>
+      </tr>
+    </thead>
+    <tbody id="students-progress-table">
+      <!-- Rows will be generated here -->
+    </tbody>
+  </table>
+  <button id="admin-logout-btn" class="mt-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium">
+    Logout
+  </button>
+</div>
     <script>
+
     // Firebase Setup
     const firebaseConfig = {
       apiKey: "AIzaSyCzPN25sXmaDuh_f_6tWQTTj6ykOi1yP4Y",
@@ -848,6 +889,77 @@ tabConsonants.addEventListener("click", function() {
 restartBtn.addEventListener("click", resetGame);
 switchModeBtn.addEventListener("click", function() {
     switchMode();
+});
+        // Navigation buttons
+const adminLoginBtn = document.getElementById('admin-login-btn');
+const adminLoginPage = document.getElementById('admin-login-page');
+const adminLoginForm = document.getElementById('admin-login-form');
+const adminLoginMessage = document.getElementById('admin-login-message');
+const backToUserLogin = document.getElementById('back-to-user-login');
+const adminPage = document.getElementById('admin-page');
+const studentsProgressTable = document.getElementById('students-progress-table');
+const adminLogoutBtn = document.getElementById('admin-logout-btn');
+
+// Show admin login page
+adminLoginBtn.addEventListener('click', function() {
+  loginPage.style.display = "none";
+  adminLoginPage.style.display = "flex";
+});
+
+// Back to student login
+backToUserLogin.addEventListener('click', function() {
+  adminLoginPage.style.display = "none";
+  loginPage.style.display = "flex";
+});
+
+// Admin login logic
+adminLoginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  adminLoginMessage.textContent = "";
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, password);
+    const userUID = result.user.uid;
+    const userDoc = await db.collection('users').doc(userUID).get();
+    if (userDoc.exists && userDoc.data().role === 'admin') {
+      adminLoginPage.style.display = "none";
+      adminPage.style.display = "block";
+      loadAllStudentProgress();
+    } else {
+      adminLoginMessage.textContent = "You are not authorized as admin.";
+      auth.signOut();
+    }
+  } catch (error) {
+    adminLoginMessage.textContent = error.message;
+  }
+});
+
+// Load all students' progress for admin dashboard
+async function loadAllStudentProgress() {
+  studentsProgressTable.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading...</td></tr>';
+  const usersSnap = await db.collection('users').where('role', '==', 'student').get();
+  let rows = '';
+  for (const doc of usersSnap.docs) {
+    const userData = doc.data();
+    const progressDoc = await db.collection('progress').doc(doc.id).get();
+    const progress = progressDoc.exists ? progressDoc.data() : {};
+    rows += `<tr>
+      <td class="py-2 px-4 border-b">${userData.username || '(no username)'}</td>
+      <td class="py-2 px-4 border-b">${userData.grade || ''}</td>
+      <td class="py-2 px-4 border-b">${progress.lessonsCompleted || 0}</td>
+      <td class="py-2 px-4 border-b">${progress.score || 0}</td>
+    </tr>`;
+  }
+  studentsProgressTable.innerHTML = rows;
+}
+
+// Admin logout
+adminLogoutBtn.addEventListener('click', function() {
+  auth.signOut().then(() => {
+    adminPage.style.display = "none";
+    loginPage.style.display = "flex";
+  });
 });
 
     </script>
