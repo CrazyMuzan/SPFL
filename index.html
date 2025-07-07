@@ -87,7 +87,7 @@
                 <div>
                     <label for="grade" class="block text-sm font-medium text-gray-700">Grade</label>
                     <select id="grade" name="grade" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="10">Grade 7</option>
+                        <option value="7">Grade 7</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
@@ -257,7 +257,7 @@
 
     // --- Game State ---
     let username = "";
-    let userGrade = 10;
+    let userGrade = 7;
     let userUID = "";
     let learnedCards = 0;
     let quizScore = 0;
@@ -395,7 +395,7 @@
               gamePage.style.display = "none";
               document.getElementById("email").value = "";
               document.getElementById("password").value = "";
-              document.getElementById("grade").value = "10";
+              document.getElementById("grade").value = "7";
               loginMessage.textContent = "";
               if (typeof resetGame === "function") resetGame();
           });
@@ -535,12 +535,12 @@ function setDifficultyByGrade() {
     difficultyIndicator.textContent = "Grade 7 - Expert";
 }
 
-// Data filtering per grade (only grade 10 now)
+// Data filtering per grade (only grade 7 now)
 function getFilteredData(type) {
     return koreanData[type];
 }
 
-// Grade features (only grade 10)
+// Grade features (only grade 7)
 function initGradeSpecificFeatures() {
     timerContainer.classList.remove("hidden");
     startTimer();
