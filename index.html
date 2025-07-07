@@ -32,9 +32,9 @@
         .difficulty-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: bold;}
         .timer { font-size: 1.25rem; font-weight: bold;}
         .word-container { min-height: 60px; display: flex; align-items: center; justify-content: center;}
-        .syllable-block { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin: 0 5px; border: 2px solid #4F46E5; border-radius: 8px; font-size: 1.75rem; font-weight: bold;}
+        .syllable-block { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin: 0 5px; border: 2px solid #4F46E5; border-radius: 8px; font-size: 1.75rem;}
         .matching-game { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;}
-        .matching-card { height: 100px; background-color: #4F46E5; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;}
+        .matching-card { height: 100px; background-color: #4F46E5; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: background 0.3s;}
         .matching-card.flipped { transform: rotateY(180deg); background-color: #E5E7EB; color: #1F2937;}
         .matching-card.matched { background-color: #10B981; pointer-events: none;}
     </style>
@@ -87,17 +87,14 @@
                 <div>
                     <label for="grade" class="block text-sm font-medium text-gray-700">Grade</label>
                     <select id="grade" name="grade" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="7">Grade 7</option>
-                        <option value="8">Grade 8</option>
-                        <option value="9">Grade 9</option>
                         <option value="10">Grade 10</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
                         Login
                     </button>
-                    <button type="button" id="register-btn" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="button" id="register-btn" class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none">
                         Register
                     </button>
                 </div>
@@ -120,7 +117,7 @@
             <h1 class="text-2xl font-bold text-gray-800">Korean Alphabet Game</h1>
             <p id="welcome-message" class="text-gray-600">Welcome, Student!</p>
             <div id="difficulty-indicator" class="mt-1 inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                Grade 7 - Beginner
+                Grade 10 - Expert
             </div>
         </div>
         <button id="logout-btn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium">
@@ -162,19 +159,6 @@
             </div>
             <div id="consonants-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;">
                 <!-- Consonants cards will be generated here -->
-            </div>
-            <!-- Word Formation Area (Grade 9) -->
-            <div id="word-formation" class="mt-6" style="display: none;">
-                <div class="bg-green-50 p-4 rounded-md mb-4">
-                    <h3 class="font-bold text-lg mb-2">Form Korean Words</h3>
-                    <p>Drag and drop the characters to form the correct Korean word:</p>
-                </div>
-                <div class="word-container p-4 bg-white rounded-md mb-4">
-                    <div id="target-word" class="flex justify-center"></div>
-                </div>
-                <div id="character-bank" class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-md">
-                    <!-- Characters will be generated here -->
-                </div>
             </div>
             <!-- Matching Game (Grade 10) -->
             <div id="matching-game" class="mt-6" style="display: none;">
@@ -273,7 +257,7 @@
 
     // --- Game State ---
     let username = "";
-    let userGrade = 7;
+    let userGrade = 10;
     let userUID = "";
     let learnedCards = 0;
     let quizScore = 0;
@@ -349,11 +333,16 @@
           const userDoc = await db.collection('users').doc(userUID).get();
           username = userDoc.data()?.username || email.split("@")[0];
           userGrade = userDoc.data()?.grade || userGrade;
-          // If this is an admin, redirect to admin panel
+          // Only allow grade 10 students (unless admin)
           if (userDoc.data()?.role === "admin") {
             loginPage.style.display = "none";
             adminPage.style.display = "block";
             loadAllStudentProgress();
+            return;
+          }
+          if (userGrade !== "10") {
+            loginMessage.textContent = "Only Grade 10 students are allowed.";
+            auth.signOut();
             return;
           }
           welcomeMessage.textContent = `Welcome, ${username}!`;
@@ -373,6 +362,10 @@
       const grade = document.getElementById("grade").value;
       if (!email || !password) {
           loginMessage.textContent = "Please provide email and password.";
+          return;
+      }
+      if (grade !== "10") {
+          loginMessage.textContent = "Only Grade 10 students are allowed.";
           return;
       }
       try {
@@ -402,7 +395,7 @@
               gamePage.style.display = "none";
               document.getElementById("email").value = "";
               document.getElementById("password").value = "";
-              document.getElementById("grade").value = "7";
+              document.getElementById("grade").value = "10";
               loginMessage.textContent = "";
               if (typeof resetGame === "function") resetGame();
           });
@@ -539,46 +532,19 @@ function initGame() {
 
 // Difficulty label
 function setDifficultyByGrade() {
-    let difficultyText = "";
-    switch(parseInt(userGrade)) {
-        case 7: difficultyText = "Grade 7 - Beginner"; break;
-        case 8: difficultyText = "Grade 8 - Intermediate"; break;
-        case 9: difficultyText = "Grade 9 - Advanced"; break;
-        case 10: difficultyText = "Grade 10 - Expert"; break;
-    }
-    difficultyIndicator.textContent = difficultyText;
+    difficultyIndicator.textContent = "Grade 10 - Expert";
 }
 
-// Data filtering per grade
+// Data filtering per grade (only grade 10 now)
 function getFilteredData(type) {
-    const data = koreanData[type];
-    switch(parseInt(userGrade)) {
-        case 7: return data.slice(0, 10);
-        case 8: return data.slice(0, 14);
-        case 9: return data.slice(0, 18);
-        case 10: return data;
-    }
+    return koreanData[type];
 }
 
-// Grade features
+// Grade features (only grade 10)
 function initGradeSpecificFeatures() {
-    timerContainer.classList.add("hidden");
-    wordFormation.style.display = "none";
+    timerContainer.classList.remove("hidden");
+    startTimer();
     matchingGame.style.display = "none";
-    switch(parseInt(userGrade)) {
-        case 8:
-            timerContainer.classList.remove("hidden");
-            startTimer();
-            break;
-        case 9:
-            timerContainer.classList.remove("hidden");
-            startTimer();
-            break;
-        case 10:
-            timerContainer.classList.remove("hidden");
-            startTimer();
-            break;
-    }
 }
 
 // Card generation
@@ -588,13 +554,8 @@ function generateCards(data, container) {
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.index = index;
-        let difficultyBadge = "";
-        if (parseInt(userGrade) >= 8) {
-            const difficulty = index < 10 ? "Basic" : (index < 14 ? "Intermediate" : "Advanced");
-            const badgeColor = index < 10 ? "bg-green-100 text-green-800" : 
-                (index < 14 ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800");
-            difficultyBadge = `<span class="difficulty-badge ${badgeColor}">${difficulty}</span>`;
-        }
+        // All are "Expert" now
+        let difficultyBadge = `<span class="difficulty-badge bg-red-100 text-red-800">Expert</span>`;
         card.innerHTML = `
             <div class="card-inner">
                 <div class="card-front">
@@ -623,13 +584,7 @@ function flipCard(card, index) {
         updateProgress();
         if (learnedCards === totalCards) {
             setTimeout(() => {
-                if (parseInt(userGrade) === 9) {
-                    startWordFormation();
-                } else if (parseInt(userGrade) === 10) {
-                    startMatchingGame();
-                } else {
-                    startQuiz();
-                }
+                startMatchingGame();
             }, 1000);
         }
     }
@@ -657,102 +612,6 @@ function updateTimerDisplay() {
     const minutes = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
     const seconds = (timerSeconds % 60).toString().padStart(2, '0');
     timerEl.textContent = `${minutes}:${seconds}`;
-}
-
-// Word formation (grade 9)
-function startWordFormation() {
-    document.getElementById(`${currentMode}-content`).style.display = "none";
-    wordFormation.style.display = "block";
-    gameInstructions.textContent = "Form Korean words by dragging characters to the correct position!";
-    const randomWord = koreanWords[Math.floor(Math.random() * koreanWords.length)];
-    targetWord.innerHTML = "";
-    for (let i = 0; i < randomWord.word.length; i++) {
-        const slot = document.createElement("div");
-        slot.className = "syllable-block";
-        slot.dataset.position = i;
-        targetWord.appendChild(slot);
-    }
-    characterBank.innerHTML = "";
-    const characters = randomWord.word.split("");
-    const otherWords = koreanWords.filter(w => w.word !== randomWord.word);
-    const decoyWord = otherWords[Math.floor(Math.random() * otherWords.length)];
-    const decoyChars = decoyWord.word.split("").slice(0, 2);
-    const allChars = [...characters, ...decoyChars];
-    for (let i = allChars.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allChars[i], allChars[j]] = [allChars[j], allChars[i]];
-    }
-    allChars.forEach((char, index) => {
-        const charEl = document.createElement("div");
-        charEl.className = "syllable-block cursor-pointer";
-        charEl.textContent = char;
-        charEl.dataset.char = char;
-        charEl.dataset.originalIndex = index;
-        charEl.draggable = true;
-        charEl.addEventListener("dragstart", dragStart);
-        characterBank.appendChild(charEl);
-    });
-    document.querySelectorAll("#target-word .syllable-block").forEach(slot => {
-        slot.addEventListener("dragover", dragOver);
-        slot.addEventListener("drop", drop);
-    });
-    targetWord.dataset.word = randomWord.word;
-    targetWord.dataset.meaning = randomWord.meaning;
-}
-
-function dragStart(e) {
-    e.dataTransfer.setData("text/plain", e.target.dataset.char);
-    e.dataTransfer.setData("originalIndex", e.target.dataset.originalIndex);
-}
-function dragOver(e) { e.preventDefault(); }
-function drop(e) {
-    e.preventDefault();
-    const char = e.dataTransfer.getData("text/plain");
-    const originalIndex = e.dataTransfer.getData("originalIndex");
-    e.target.textContent = char;
-    e.target.dataset.filled = "true";
-    const charElements = characterBank.querySelectorAll(".syllable-block");
-    charElements.forEach(el => {
-        if (el.dataset.originalIndex === originalIndex) {
-            el.style.visibility = "hidden";
-            el.draggable = false;
-        }
-    });
-    checkWordCompletion();
-}
-function checkWordCompletion() {
-    const slots = targetWord.querySelectorAll(".syllable-block");
-    const allFilled = Array.from(slots).every(slot => slot.dataset.filled === "true");
-    if (allFilled) {
-        const formedWord = Array.from(slots).map(slot => slot.textContent).join("");
-        const correctWord = targetWord.dataset.word;
-        if (formedWord === correctWord) {
-            createConfetti();
-            const successMsg = document.createElement("div");
-            successMsg.className = "mt-4 p-3 bg-green-100 text-green-800 rounded-md text-center";
-            successMsg.innerHTML = `<p class="font-bold">Correct! 🎉</p>
-                <p>${correctWord} means "${targetWord.dataset.meaning}" in English</p>`;
-            wordFormation.appendChild(successMsg);
-            setTimeout(() => { startQuiz(); }, 2000);
-        } else {
-            const errorMsg = document.createElement("div");
-            errorMsg.className = "mt-4 p-3 bg-red-100 text-red-800 rounded-md text-center";
-            errorMsg.innerHTML = `<p class="font-bold">Not quite right. Try again!</p>`;
-            wordFormation.appendChild(errorMsg);
-            setTimeout(() => {
-                errorMsg.remove();
-                slots.forEach(slot => {
-                    slot.textContent = "";
-                    slot.dataset.filled = "false";
-                });
-                const charElements = characterBank.querySelectorAll(".syllable-block");
-                charElements.forEach(el => {
-                    el.style.visibility = "visible";
-                    el.draggable = true;
-                });
-            }, 2000);
-        }
-    }
 }
 
 // Matching Game (grade 10)
@@ -832,7 +691,6 @@ function resetCards() {
 function startQuiz() {
     clearInterval(timerInterval);
     document.getElementById(`${currentMode}-content`).style.display = "none";
-    wordFormation.style.display = "none";
     matchingGame.style.display = "none";
     quizArea.style.display = "block";
     gameInstructions.textContent = "Choose the correct pronunciation for each Korean character!";
@@ -858,7 +716,7 @@ function showNextQuizQuestion() {
     quizCharacter.textContent = currentQuestion.character;
     const options = [currentQuestion.romanization];
     const allOptions = getFilteredData(currentMode).map(item => item.romanization);
-    const numOptions = parseInt(userGrade) <= 8 ? 3 : 4;
+    const numOptions = 4;
     while (options.length < numOptions) {
         const randomOption = allOptions[Math.floor(Math.random() * allOptions.length)];
         if (!options.includes(randomOption)) options.push(randomOption);
@@ -924,12 +782,9 @@ function resetGame() {
     document.getElementById(`${currentMode}-content`).style.display = "grid";
     quizArea.style.display = "none";
     resultsArea.style.display = "none";
-    wordFormation.style.display = "none";
     matchingGame.style.display = "none";
     gameInstructions.textContent = `Click on each card to learn Korean ${currentMode}. Try to memorize them all!`;
-    if (parseInt(userGrade) >= 8) {
-        startTimer();
-    }
+    startTimer();
     updateProgress();
 }
 
