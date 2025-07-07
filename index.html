@@ -87,7 +87,7 @@
                 <div>
                     <label for="grade" class="block text-sm font-medium text-gray-700">Grade</label>
                     <select id="grade" name="grade" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="10">Grade 10</option>
+                        <option value="10">Grade 7</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
@@ -117,7 +117,7 @@
             <h1 class="text-2xl font-bold text-gray-800">Korean Alphabet Game</h1>
             <p id="welcome-message" class="text-gray-600">Welcome, Student!</p>
             <div id="difficulty-indicator" class="mt-1 inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                Grade 10 - Expert
+                Grade 7 - Expert
             </div>
         </div>
         <button id="logout-btn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium">
@@ -160,7 +160,7 @@
             <div id="consonants-content" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;">
                 <!-- Consonants cards will be generated here -->
             </div>
-            <!-- Matching Game (Grade 10) -->
+            <!-- Matching Game (Grade 7) -->
             <div id="matching-game" class="mt-6" style="display: none;">
                 <div class="bg-purple-50 p-4 rounded-md mb-4">
                     <h3 class="font-bold text-lg mb-2">Memory Matching Game</h3>
@@ -333,15 +333,15 @@
           const userDoc = await db.collection('users').doc(userUID).get();
           username = userDoc.data()?.username || email.split("@")[0];
           userGrade = userDoc.data()?.grade || userGrade;
-          // Only allow grade 10 students (unless admin)
+          // Only allow grade 7 students (unless admin)
           if (userDoc.data()?.role === "admin") {
             loginPage.style.display = "none";
             adminPage.style.display = "block";
             loadAllStudentProgress();
             return;
           }
-          if (userGrade !== "10") {
-            loginMessage.textContent = "Only Grade 10 students are allowed.";
+          if (userGrade !== "7") {
+            loginMessage.textContent = "Only Grade 7 students are allowed.";
             auth.signOut();
             return;
           }
@@ -364,8 +364,8 @@
           loginMessage.textContent = "Please provide email and password.";
           return;
       }
-      if (grade !== "10") {
-          loginMessage.textContent = "Only Grade 10 students are allowed.";
+      if (grade !== "7") {
+          loginMessage.textContent = "Only Grade 7 students are allowed.";
           return;
       }
       try {
@@ -532,7 +532,7 @@ function initGame() {
 
 // Difficulty label
 function setDifficultyByGrade() {
-    difficultyIndicator.textContent = "Grade 10 - Expert";
+    difficultyIndicator.textContent = "Grade 7 - Expert";
 }
 
 // Data filtering per grade (only grade 10 now)
@@ -614,7 +614,7 @@ function updateTimerDisplay() {
     timerEl.textContent = `${minutes}:${seconds}`;
 }
 
-// Matching Game (grade 10)
+// Matching Game (grade 7)
 function startMatchingGame() {
     document.getElementById(`${currentMode}-content`).style.display = "none";
     matchingGame.style.display = "block";
